@@ -12,7 +12,7 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 })
 export class ListComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'year', 'title', 'winner'];
-  exampleDatabase: MovieHttpClient | null;
+  movieHttpClient: MovieHttpClient | null;
   data: Movie[] = [];
 
   resultsLength = 0;
@@ -24,14 +24,14 @@ export class ListComponent implements AfterViewInit {
   constructor(private _httpClient: HttpClient) {}
 
   ngAfterViewInit() {
-    this.exampleDatabase = new MovieHttpClient(this._httpClient);
+    this.movieHttpClient = new MovieHttpClient(this._httpClient);
 
     merge(this.paginator.page)
       .pipe(
         startWith({}),
         switchMap(() => {
           this.isLoadingResults = true;
-          return this.exampleDatabase!.getMovies(
+          return this.movieHttpClient!.getMovies(
             this.paginator.pageIndex, 30, false, 1980
           );
         }),
@@ -65,7 +65,6 @@ export interface Movie {
   winner: boolean;
 }
 
-/** An example database that the data source uses to retrieve data for the table. */
 export class MovieHttpClient {
   constructor(private _httpClient: HttpClient) {}
 
