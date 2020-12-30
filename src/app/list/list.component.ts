@@ -1,9 +1,11 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
 import { MatPaginator } from '@angular/material/paginator';
-import { merge, Observable, of as observableOf } from 'rxjs';
+import { merge, of as observableOf } from 'rxjs';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
+
+import { Movie, TexoItService } from '../texo-it/texo-it.service';
+
 
 @Component({
   selector: 'app-list',
@@ -12,8 +14,7 @@ import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 })
 export class ListComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'year', 'title', 'winner'];
-  movieHttpClient: MovieHttpClient | null;
-  data: Movie[] = [];
+  movies: Movie[] = [];
 
   resultsLength = 0;
   isLoadingResults = true;
@@ -21,18 +22,16 @@ export class ListComponent implements AfterViewInit {
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
-  constructor(private _httpClient: HttpClient) {}
+  constructor(private texoItService: TexoItService) {}
 
   ngAfterViewInit() {
-    this.movieHttpClient = new MovieHttpClient(this._httpClient);
-
     merge(this.paginator.page)
       .pipe(
         startWith({}),
         switchMap(() => {
           this.isLoadingResults = true;
-          return this.movieHttpClient!.getMovies(
-            this.paginator.pageIndex, 30, false, 1980
+          return this.texoItService!.getMovies(
+            this.paginator.pageIndex, 30, undefined, undefined
           );
         }),
         map(data => {
@@ -47,31 +46,6 @@ export class ListComponent implements AfterViewInit {
           this.isRateLimitReached = true;
           return observableOf([]);
         })
-      ).subscribe(data => this.data = data);
-  }
-}
-
-export interface MovieApi {
-  content: Movie[];
-  totalElements: number;
-}
-
-export interface Movie {
-  id: number;
-  year: number;
-  title: string;
-  studios: Array<string>;
-  producers: Array<string>;
-  winner: boolean;
-}
-
-export class MovieHttpClient {
-  constructor(private _httpClient: HttpClient) {}
-
-  getMovies(page: number, size: number, winner: boolean, year: number): Observable<MovieApi> {
-    const href = 'https://tools.texoit.com/backend-java/api/movies';
-    const requestUrl = `${href}?page=${page}&size=${size}&winner=${winner}&year=${year}`;
-
-    return this._httpClient.get<MovieApi>(requestUrl);
+      ).subscribe(data => this.movies = data);
   }
 }

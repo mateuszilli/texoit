@@ -7,7 +7,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -16,6 +15,8 @@ import { MatTableModule } from '@angular/material/table';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ListComponent } from './list/list.component';
+
+import { TexoItService } from './texo-it/texo-it.service';
 
 @NgModule({
   declarations: [
@@ -29,15 +30,14 @@ import { ListComponent } from './list/list.component';
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
-    
-    MatGridListModule, 
+
     MatButtonModule,
     MatToolbarModule,
     MatPaginatorModule,
     MatSortModule,
     MatTableModule
   ],
-  providers: [],
+  providers: [TexoItService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
